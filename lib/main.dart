@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gsheets/gsheets.dart';
+import 'package:searchfield/searchfield.dart';
 
 const credentials = r'''
 {
@@ -62,21 +64,34 @@ class _MyHomePageState extends State<MyHomePage> {
     //final firstRow = ['index', 'letter', 'number', 'label'];
     //await sheet.values.insertRow(1, firstRow);
 
-    await sheet?.values.map.appendRow(secondRow);
+    await sheet?.values.map.appendRow(nextRow);
   }
 
   final name = TextEditingController();
   final project = TextEditingController();
   final init = TextEditingController();
   final EM = TextEditingController();
+  final designation_selected = TextEditingController();
 
-  var secondRow =
+  String lol = '';
+
+  //String select_designation;
+  String dropdownValue='Analyst';
+
+  //Blank row initialization
+  var nextRow =
   {
     'Name': '',
     'Project Details': '',
     'Initiative': '',
     'Engagement Manager': '',
+    'Designation':'',
   };
+
+  List <String> designations = [
+    'Analyst', 'Associate Consultant', 'Consultant', 'Assistant Manager', 'Manager',
+  ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: SingleChildScrollView(
+        //FORM TO FILL
         child: Container(
           //height: double.infinity,
           //elevation: 6,
@@ -94,6 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Column(
                 //mainAxisAlignment: MainAxisAlignment.,
                 children: <Widget>[
+                  //Name details
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Text(
@@ -109,6 +126,63 @@ class _MyHomePageState extends State<MyHomePage> {
                     controller: name,
                   ),
                   Text(''),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      'Enter your designation',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    ),
+                  ),//Designation drop down
+
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                        color:Colors.white, //background color of dropdown button
+                        border: Border.all(color: Colors.grey, width:1), //border of dropdown button
+                        borderRadius: BorderRadius.circular(15), //border raiuds of dropdown button
+                        // boxShadow: <BoxShadow>[ //apply shadow on Dropdown button
+                        //   BoxShadow(
+                        //       color: Colors.grey, //shadow for button
+                        //       blurRadius: 5) //blur radius of shadow
+                        // ]
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: SizedBox(
+                        width: 300,
+                         child: DropdownButton<String>(
+                           //alignment: Alignment.center,
+                            value: dropdownValue,
+                            //icon: const Icon(Icons.arrow_downward,),
+                            elevation: 16,
+                            style: const TextStyle(color: Colors.black),
+                            underline: Container(
+                              height: 0,
+                              color: Colors.white,
+                        ),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          dropdownValue = newValue!;
+                          lol = newValue;
+
+                        });
+                      },
+                      items: <String>['Analyst', 'Associate Consultant', 'Consultant', 'Assistant Manager', 'Manager',]
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                ),
+              ),
+                    ),
+                  ),
+                  Text(''),
+
+
+                  // Project Details
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Text(
@@ -120,10 +194,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   TextField(
                     decoration: InputDecoration(
                       border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
-                      hintText: 'Enter Text',),
+                      hintText: 'Enter text',),
                     controller: project,
                   ),
                   Text(''),
+
+                  //Initiative Details
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Text(
@@ -135,10 +211,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   TextField(
                     decoration: InputDecoration(
                       border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
-                      hintText: 'Enter Text',),
+                      hintText: 'Enter text',),
                     controller: init,
                   ),
                   Text(''),
+
+                  //Engagement Manager Details
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Text(
@@ -150,9 +228,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   TextField(
                     decoration: InputDecoration(
                       border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
-                      hintText: 'Enter Text',),
+                      hintText: 'Enter text',),
                     controller: EM,
                   ),
+
+                  //Submit Button
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 30),
                     child: SizedBox(
@@ -164,16 +244,17 @@ class _MyHomePageState extends State<MyHomePage> {
                           RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25.0),
                               ))),
-                        child: Text("Submit",
+                        child: Text("SUBMIT",
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 30),),
                         onPressed:
                           (){
-                        secondRow = {
+                        nextRow = {
                           'Name': name.text,
                           'Project Details': project.text,
                           'Initiative': init.text,
                           'Engagement Manager': EM.text,
+                          'Designation': lol,
                         };
                         inputIntoSheet();
                         
@@ -187,7 +268,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           );
                         });
 
-                    
 
                       },
                       ),
